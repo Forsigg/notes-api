@@ -1,8 +1,10 @@
+from typing import Union
+
 from rest_framework.response import Response
 
 
 def json_response(
-    status: int = 200, data: dict = None, message: str = None
+    status: int = 200, data: Union[dict, set] = None, message: str = None
 ) -> Response:
     if data is None:
         data = {}
