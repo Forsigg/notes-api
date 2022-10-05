@@ -1,8 +1,7 @@
 import json
 from typing import Optional
 from django.contrib.auth.models import User
-from django.test import TestCase, Client
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APITestCase
 
 import notes
 from notes.models import Note
@@ -16,7 +15,9 @@ class NoteTests(APITestCase):
     @classmethod
     def setUpTestData(cls):
         author: User = User.objects.create_user(
-            username="test", password="test", email="test@test.com",
+            username="test",
+            password="test",
+            email="test@test.com",
         )
         Note.objects.create(text="Test", author=author, pub_date="2022-10-05")
         Note.objects.create(text="Test2", author=author, pub_date="2022-10-05")
@@ -26,12 +27,10 @@ class NoteTests(APITestCase):
         resp = self.client.post(
             path="/api/token/",
             data={"username": self.__user.username, "password": "test"},
-            format='json'
+            format="json",
         )
-        token = resp.data['access']
+        token = resp.data["access"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
-        # cls.__headers = {"Authorization": f"Bearer {token['access']}"}
-        # cls.client = Client(**cls.__headers)
 
     def test_success_get_in_view(self):
         resp = self.client.get("/api/v1/notes/1/")
@@ -51,7 +50,7 @@ class NoteTests(APITestCase):
         resp = self.client.post(
             "/api/v1/notes/",
             data={"text": "test in view", "author": 1},
-            format='json',
+            format="json",
         )
         self.assertEqual(resp.status_code, 200)
         note = Note.objects.get(pk=3)

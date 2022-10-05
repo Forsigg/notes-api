@@ -71,11 +71,10 @@ class NoteViewSet(viewsets.ViewSet):
         note = Note.objects.get(pk=pk)
         if note:
             note.delete()
-            return Response(data={
-                'status': 'ok',
-                'message': f'Заметка с id(pk) {pk} удалена'
-            })
+            return Response(
+                data={"status": "ok", "message": f"Заметка с id(pk) {pk} удалена"}
+            )
         else:
-            return Response(data={
-                    "detail": {"error": f"Заметка с id(pk) {pk} не найдена"}
-                })
+            return Response(
+                data={"detail": {"error": f"Заметка с id(pk) {pk} не найдена"}}
+            )
