@@ -34,17 +34,10 @@ class NoteTests(APITestCase):
 
     def test_success_get_in_view(self):
         resp = self.client.get("/api/v1/notes/1/")
+        note = Note.objects.get(pk=1)
+        serializer = NoteSerializer(note)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(
-            resp.content,
-            b"{"
-            b'"id":1,'
-            b'"pub_date":"2022-10-05",'
-            b'"text":"Test",'
-            b'"category":null,'
-            b'"author":1'
-            b"}",
-        )
+        self.assertEqual(json.loads(resp.content)["detail"]["data"], serializer.data)
 
     def test_success_create_in_view(self):
         resp = self.client.post(
@@ -60,7 +53,7 @@ class NoteTests(APITestCase):
         resp = self.client.get("/api/v1/notes/")
         notes = Note.objects.all()
         serializer = NoteSerializer(notes, many=True)
-        self.assertEqual(json.loads(resp.content), serializer.data)
+        self.assertEqual(json.loads(resp.content)["detail"]["data"], serializer.data)
 
     def test_success_delete_note(self):
         self.client.delete("/api/v1/notes/2/")
