@@ -1,0 +1,8 @@
+general:
+  secret-key: "django-insecure-eqlhlq%9z^-!l@08cw7prf8)9($&*mvc#@vnlqxy=-xj%o3mw_"
+database:
+  name: 'notes-api'
+  user: 'admin'
+  password: 'adminpass'
+  host: 'db'
+  port: 5432

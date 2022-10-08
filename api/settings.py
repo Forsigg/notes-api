@@ -17,19 +17,25 @@ from config import init_config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+# Инициализация конфига в случае, если имеется файл config.yml
 config = init_config(BASE_DIR.joinpath('config.yml'))
+
+# В случае, если конфигурационные данные будут определяться в docker-compose.yml,
+# то необходимо заменить соответствующие поля в DATABASES и SECRET_KEY на
+# os.environ.get('VAR_NAME')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config.general.secret_key
+SECRET_KEY = config.general.secret_key  # получаем из config.yml
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -85,7 +91,7 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config.database.name,
+        'NAME': config.database.name,  # Данные берутся из config.yml
         'USER': config.database.user,
         'PASSWORD': config.database.password,
         'HOST': config.database.host,
