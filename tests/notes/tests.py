@@ -45,7 +45,7 @@ class NoteTests(APITestCase):
             data={"text": "test in view", "author": 1},
             format="json",
         )
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 201)
         note = Note.objects.get(pk=3)
         self.assertEqual(note.text, "test in view")
 
@@ -54,6 +54,20 @@ class NoteTests(APITestCase):
         notes = Note.objects.all()
         serializer = NoteSerializer(notes, many=True)
         self.assertEqual(json.loads(resp.content)["detail"]["data"], serializer.data)
+
+    def test_success_update_note(self):
+        note = Note.objects.get(pk=1)
+        serializer = NoteSerializer(note)
+        resp = self.client.put(
+            "/api/v1/notes/1/", data={"text": "new text", "author": 1}, format="json"
+        )
+        json_resp = json.loads(resp.content)["detail"]["data"]
+        self.assertEqual(resp.status_code, 201)
+        self.assertNotEqual(json_resp, serializer.data)
+        note = Note.objects.get(pk=1)
+        serializer = NoteSerializer(note)
+        self.assertEqual(note.text, "new text")
+        self.assertEqual(json_resp, serializer.data)
 
     def test_success_delete_note(self):
         self.client.delete("/api/v1/notes/2/")
