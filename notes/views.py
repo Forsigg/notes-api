@@ -29,7 +29,8 @@ class NoteViewSet(viewsets.ViewSet):
         serializer = NoteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return json_response(data=serializer.data, message='Заметка успешно создана.')
+            return json_response(data=serializer.data, message='Заметка успешно '
+                                                               'создана.', status=201)
         else:
             return json_response_error(status=400, data=serializer.errors,
                                        message='Ошибка в данных запроса')
@@ -92,3 +93,20 @@ class NoteViewSet(viewsets.ViewSet):
                       "data": serializer.data
                   }}
         )
+
+    def update(self, request: Request, pk: int = None) -> Response:
+        try:
+            note = get_object_or_404(Note, pk=pk)
+        except Http404:
+            return json_response_error(status=404, message=f'Заметка с pk(id) {pk} не найдена.')
+        serializer = NoteSerializer(note, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return json_response(status=201, message=f'Заметка с pk(id) {pk} '
+                                                     f'обновлена.', data=serializer.data)
+        else:
+            return json_response_error(status=400, data=serializer.errors,
+                                       message='error')
+
+    def partial_update(self, request: Request, pk: int = None) -> Response:
+        pass
