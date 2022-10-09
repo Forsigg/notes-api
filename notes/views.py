@@ -29,11 +29,13 @@ class NoteViewSet(viewsets.ViewSet):
         serializer = NoteSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return json_response(data=serializer.data, message='Заметка успешно '
-                                                               'создана.', status=201)
+            return json_response(
+                data=serializer.data, message="Заметка успешно " "создана.", status=201
+            )
         else:
-            return json_response_error(status=400, data=serializer.errors,
-                                       message='Ошибка в данных запроса')
+            return json_response_error(
+                status=400, data=serializer.errors, message="Ошибка в данных запроса"
+            )
 
     def retrieve(self, request: Request, pk: int = None) -> Response:
         """
@@ -45,7 +47,9 @@ class NoteViewSet(viewsets.ViewSet):
         try:
             note = get_object_or_404(queryset, pk=pk)
         except Http404:
-            return json_response_error(status=404, message=f'Заметка с pk(id) {pk} не найдена.')
+            return json_response_error(
+                status=404, message=f"Заметка с pk(id) {pk} не найдена."
+            )
         serializer = NoteSerializer(note)
         return json_response(data=serializer.data)
 
@@ -72,7 +76,9 @@ class NoteViewSet(viewsets.ViewSet):
             serializer = NoteSerializer(notes, many=True)
             return json_response(data=serializer.data)
         else:
-            return json_response_error(status=404, message=f"Пользователь с user_pk {user_pk} не найден.")
+            return json_response_error(
+                status=404, message=f"Пользователь с user_pk {user_pk} не найден."
+            )
 
     def destroy(self, request: Request, pk: int = None):
         """
@@ -83,30 +89,40 @@ class NoteViewSet(viewsets.ViewSet):
         try:
             note = get_object_or_404(Note, pk=pk)
         except Http404:
-            return json_response_error(status=404, message=f'Заметка с pk(id) {pk} не найдена.')
+            return json_response_error(
+                status=404, message=f"Заметка с pk(id) {pk} не найдена."
+            )
         note.delete()
         serializer = NoteSerializer(note)
         return Response(
-            data={"status": "ok",
-                  "detail": {
-                      "message": f"Заметка с id(pk) {pk} удалена",
-                      "data": serializer.data
-                  }}
+            data={
+                "status": "ok",
+                "detail": {
+                    "message": f"Заметка с id(pk) {pk} удалена",
+                    "data": serializer.data,
+                },
+            }
         )
 
     def update(self, request: Request, pk: int = None) -> Response:
         try:
             note = get_object_or_404(Note, pk=pk)
         except Http404:
-            return json_response_error(status=404, message=f'Заметка с pk(id) {pk} не найдена.')
+            return json_response_error(
+                status=404, message=f"Заметка с pk(id) {pk} не найдена."
+            )
         serializer = NoteSerializer(note, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return json_response(status=201, message=f'Заметка с pk(id) {pk} '
-                                                     f'обновлена.', data=serializer.data)
+            return json_response(
+                status=201,
+                message=f"Заметка с pk(id) {pk} " f"обновлена.",
+                data=serializer.data,
+            )
         else:
-            return json_response_error(status=400, data=serializer.errors,
-                                       message='error')
+            return json_response_error(
+                status=400, data=serializer.errors, message="error"
+            )
 
     def partial_update(self, request: Request, pk: int = None) -> Response:
         pass
