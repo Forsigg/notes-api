@@ -7,12 +7,6 @@ from api.utils import json_response, json_response_error
 from users.serializers import UserSerializer
 
 
-class LoginView(APIView):
-    def post(self, request: Request) -> Response:
-        # TODO: Сделать вью для логина пользователя
-        pass
-
-
 class UserRegisterView(APIView):
     """
     View для добавления (регистрации) пользователя

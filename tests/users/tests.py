@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 from users.serializers import UserSerializer
 
 
-class UserTests(APITestCase):
+class UserRegisterTests(APITestCase):
     def test_add_user(self):
         self.assertEqual(0, User.objects.count())
         resp = self.client.post(
@@ -20,3 +20,20 @@ class UserTests(APITestCase):
             json_resp,
             {"id": serializer.data["id"], "username": serializer.data["username"]},
         )
+
+    def test_user_already_exist(self):
+        resp = self.client.post(
+            "/api/v1/auth/register/", data={"username": "test", "password": "test"}
+        )
+        test_resp = self.client.post(
+            "/api/v1/auth/register/", data={"username": "test", "password": "test"}
+        )
+        users_count = User.objects.count()
+        self.assertEqual(test_resp.status_code, 400)
+        self.assertEqual(users_count, 1)
+
+    def incorrect_user_fields(self):
+        resp = self.client.post("/api/v1/auth/register/", data={"username": "test2"})
+        self.assertEqual(resp.status_code, 400)
+        users_count = User.objects.count()
+        self.assertEqual(users_count, 0)
