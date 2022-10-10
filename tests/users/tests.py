@@ -41,10 +41,13 @@ class UserRegisterTests(APITestCase):
 
 class UserDeleteTests(APITestCase):
     def test_delete_user_success(self):
+        print(User.objects.count())
         self.client.post(
             "/api/v1/auth/register/", data={"username": "test", "password": "test"}
         )
-        resp = self.client.delete("/api/v1/auth/users/1/")
+        print(User.objects.count())
+        resp = self.client.delete("/api/v1/auth/users/2/")
+        print(json.loads(resp.content))
         self.assertEqual(resp.status_code, 200)
         users_count = User.objects.count()
         self.assertEqual(users_count, 0)
@@ -52,7 +55,7 @@ class UserDeleteTests(APITestCase):
     def test_delete_if_user_not_exist(self):
         users_count = User.objects.count()
         self.assertEqual(users_count, 0)
-        resp = self.client.delete("/api/v1/auth/users/1/")
+        resp = self.client.delete("/api/v1/auth/users/2/")
         self.assertEqual(resp.status_code, 404)
         users_count = User.objects.count()
         self.assertEqual(users_count, 0)

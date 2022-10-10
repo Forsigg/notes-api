@@ -94,15 +94,8 @@ class NoteViewSet(viewsets.ViewSet):
             )
         note.delete()
         serializer = NoteSerializer(note)
-        return Response(
-            data={
-                "status": "ok",
-                "detail": {
-                    "message": f"Заметка с id(pk) {pk} удалена",
-                    "data": serializer.data,
-                },
-            }
-        )
+        return json_response(status=200, message=f"Заметка с id(pk) {pk} удалена", data=
+                             serializer.data)
 
     def update(self, request: Request, pk: int = None) -> Response:
         try:
