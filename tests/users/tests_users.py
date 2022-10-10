@@ -41,13 +41,10 @@ class UserRegisterTests(APITestCase):
 
 class UserDeleteTests(APITestCase):
     def test_delete_user_success(self):
-        print(User.objects.count())
         self.client.post(
             "/api/v1/auth/register/", data={"username": "test", "password": "test"}
         )
-        print(User.objects.count())
-        resp = self.client.delete("/api/v1/auth/users/2/")
-        print(json.loads(resp.content))
+        resp = self.client.delete("/api/v1/auth/users/3/")
         self.assertEqual(resp.status_code, 200)
         users_count = User.objects.count()
         self.assertEqual(users_count, 0)

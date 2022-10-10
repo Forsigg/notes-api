@@ -33,8 +33,9 @@ class NoteTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
 
     def test_success_get_in_view(self):
-        resp = self.client.get("/api/v1/notes/1/")
-        note = Note.objects.get(pk=1)
+        resp = self.client.get("/api/v1/notes/2/")
+        note_id = json.loads(resp.content)['detail']['data']['id']
+        note = Note.objects.get(pk=note_id)
         serializer = NoteSerializer(note)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(json.loads(resp.content)["detail"]["data"], serializer.data)
@@ -42,11 +43,12 @@ class NoteTests(APITestCase):
     def test_success_create_in_view(self):
         resp = self.client.post(
             "/api/v1/notes/",
-            data={"text": "test in view", "author": 1},
+            data={"text": "test in view", "author": 2},
             format="json",
         )
+        note_id = json.loads(resp.content)['detail']['data']['id']
         self.assertEqual(resp.status_code, 201)
-        note = Note.objects.get(pk=3)
+        note = Note.objects.get(pk=note_id)
         self.assertEqual(note.text, "test in view")
 
     def test_success_get_list_notes(self):
@@ -56,15 +58,17 @@ class NoteTests(APITestCase):
         self.assertEqual(json.loads(resp.content)["detail"]["data"], serializer.data)
 
     def test_success_update_note(self):
-        note = Note.objects.get(pk=1)
+        note = Note.objects.get(pk=3)
         serializer = NoteSerializer(note)
         resp = self.client.put(
-            "/api/v1/notes/1/", data={"text": "new text", "author": 1}, format="json"
+            "/api/v1/notes/3/", data={"text": "new text", "author": 2}, format="json"
         )
         json_resp = json.loads(resp.content)["detail"]["data"]
+        print('JSON!!!', json_resp)
+        note_id = json.loads(resp.content)['detail']['data']['id']
         self.assertEqual(resp.status_code, 201)
         self.assertNotEqual(json_resp, serializer.data)
-        note = Note.objects.get(pk=1)
+        note = Note.objects.get(pk=note_id)
         serializer = NoteSerializer(note)
         self.assertEqual(note.text, "new text")
         self.assertEqual(json_resp, serializer.data)

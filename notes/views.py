@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from api.utils import json_response_error, json_response
-from notes.models import Note
+from notes.models import Note, Category
 from notes.serializers import NoteSerializer
 
 
@@ -43,9 +43,8 @@ class NoteViewSet(viewsets.ViewSet):
         Вью для получения заметки по id(pk)
         URL: /api/v1/notes/<pk>
         """
-        queryset = Note.objects.all()
         try:
-            note = get_object_or_404(queryset, pk=pk)
+            note = get_object_or_404(Note, pk=pk)
         except Http404:
             return json_response_error(
                 status=404, message=f"Заметка с pk(id) {pk} не найдена."
@@ -118,4 +117,26 @@ class NoteViewSet(viewsets.ViewSet):
             )
 
     def partial_update(self, request: Request, pk: int = None) -> Response:
+        # TODO: Доделать частичное обновление заметки
         pass
+
+
+class CategoryViewSet(viewsets.ViewSet):
+    """
+    ViewSet для добавления, удаления, изменения и получения категории, а также списка
+    категорий
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request: Request, pk: int = None) -> Response:
+        """
+        Method GET
+        View для получения категории по её id(pk)
+        URL: /api/v1/categories/<int:pk>/
+        """
+        try:
+            category = get_object_or_404(Category, pk=pk)
+        except Http404:
+            pass
