@@ -1,6 +1,7 @@
 import json
 from typing import Optional
 from django.contrib.auth.models import User
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 import notes
@@ -25,7 +26,7 @@ class NoteTests(APITestCase):
 
     def setUp(self) -> None:
         resp = self.client.post(
-            path="/api/token/",
+            path=reverse("token_obtain_pair"),
             data={"username": self.__user.username, "password": "test"},
             format="json",
         )
@@ -33,7 +34,7 @@ class NoteTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {token}")
 
     def test_success_get_in_view(self):
-        resp = self.client.get("/api/v1/notes/2/")
+        resp = self.client.get(reverse("notes-detail", kwargs={"pk": 2}))
         note_id = json.loads(resp.content)["detail"]["data"]["id"]
         note = Note.objects.get(pk=note_id)
         serializer = NoteSerializer(note)
@@ -42,7 +43,7 @@ class NoteTests(APITestCase):
 
     def test_success_create_in_view(self):
         resp = self.client.post(
-            "/api/v1/notes/",
+            reverse("notes-list"),
             data={"text": "test in view", "author": 2},
             format="json",
         )
@@ -52,7 +53,7 @@ class NoteTests(APITestCase):
         self.assertEqual(note.text, "test in view")
 
     def test_success_get_list_notes(self):
-        resp = self.client.get("/api/v1/notes/")
+        resp = self.client.get(reverse("notes-list"))
         notes = Note.objects.all()
         serializer = NoteSerializer(notes, many=True)
         self.assertEqual(json.loads(resp.content)["detail"]["data"], serializer.data)
@@ -61,7 +62,9 @@ class NoteTests(APITestCase):
         note = Note.objects.get(pk=3)
         serializer = NoteSerializer(note)
         resp = self.client.put(
-            "/api/v1/notes/3/", data={"text": "new text", "author": 2}, format="json"
+            reverse("notes-detail", kwargs={"pk": 3}),
+            data={"text": "new text", "author": 2},
+            format="json",
         )
         json_resp = json.loads(resp.content)["detail"]["data"]
         note_id = json.loads(resp.content)["detail"]["data"]["id"]
@@ -73,7 +76,7 @@ class NoteTests(APITestCase):
         self.assertEqual(json_resp, serializer.data)
 
     def test_success_delete_note(self):
-        self.client.delete("/api/v1/notes/2/")
+        self.client.delete(reverse("notes-detail", kwargs={"pk": 2}))
         count = Note.objects.all().count()
         self.assertRaises(notes.models.Note.DoesNotExist, Note.objects.get, pk=2)
         self.assertEqual(1, count)

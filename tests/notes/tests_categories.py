@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.models import User
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from notes.models import Category, Note
@@ -23,7 +24,7 @@ class CategoryTests(APITestCase):
 
     def setUp(self) -> None:
         resp = self.client.post(
-            path="/api/token/",
+            path=reverse("token_obtain_pair"),
             data={"username": self.__user.username, "password": "test"},
             format="json",
         )
@@ -34,7 +35,7 @@ class CategoryTests(APITestCase):
         cat_count = Category.objects.count()
         self.assertEqual(cat_count, 1)
         resp = self.client.post(
-            "/api/v1/categories/", data={"title": "job"}, format="json"
+            reverse("categories-list"), data={"title": "job"}, format="json"
         )
         self.assertEqual(resp.status_code, 201)
         cat_count = Category.objects.count()
@@ -46,7 +47,7 @@ class CategoryTests(APITestCase):
         self.assertEqual(json_body, serializer.data)
 
     def test_success_get_category(self):
-        resp = self.client.get("/api/v1/categories/1/")
+        resp = self.client.get(reverse("categories-detail", kwargs={"pk": 1}))
         json_body = json.loads(resp.content)
         cat = Category.objects.get(pk=1)
         serializer = CategorySerializer(cat)
@@ -54,7 +55,7 @@ class CategoryTests(APITestCase):
         self.assertEqual(json_body["detail"]["data"], serializer.data)
 
     def test_success_get_list_categories(self):
-        resp = self.client.get("/api/v1/categories/")
+        resp = self.client.get(reverse("categories-list"))
         self.assertEqual(resp.status_code, 200)
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
@@ -64,6 +65,6 @@ class CategoryTests(APITestCase):
     def test_success_delete_category(self):
         count_categories = Category.objects.count()
         self.assertEqual(1, count_categories)
-        resp = self.client.delete("/api/v1/categories/1/")
+        resp = self.client.delete(reverse("categories-detail", kwargs={"pk": 1}))
         count_categories = Category.objects.count()
         self.assertEqual(0, count_categories)
