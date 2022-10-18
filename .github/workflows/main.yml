@@ -29,8 +29,7 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Docker container with DB
         run: |
-          docker run --name db -e POSTGRES_PASSWORD=adminpass -e POSTGRES_DB=notes-api 
-          -e POSTGRES_USER=admin -d postgres
+          docker run --name db -e POSTGRES_PASSWORD=adminpass -e POSTGRES_DB=notes-api -e POSTGRES_USER=admin -d postgres
       - name: Test with pytest
         run: |
           python manage.py test
