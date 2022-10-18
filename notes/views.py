@@ -9,7 +9,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from api.utils import json_response_error, json_response
 from notes.models import Note, Category
-from notes.serializers import NoteSerializer
+from notes.serializers import NoteSerializer, CategorySerializer
 
 
 class NoteViewSet(viewsets.ViewSet):
@@ -32,10 +32,10 @@ class NoteViewSet(viewsets.ViewSet):
             return json_response(
                 data=serializer.data, message="Заметка успешно " "создана.", status=201
             )
-        else:
-            return json_response_error(
-                status=400, data=serializer.errors, message="Ошибка в данных запроса"
-            )
+
+        return json_response_error(
+            status=400, data=serializer.errors, message="Ошибка в данных запроса"
+        )
 
     def retrieve(self, request: Request, pk: int = None) -> Response:
         """
@@ -93,8 +93,9 @@ class NoteViewSet(viewsets.ViewSet):
             )
         note.delete()
         serializer = NoteSerializer(note)
-        return json_response(status=200, message=f"Заметка с id(pk) {pk} удалена", data=
-                             serializer.data)
+        return json_response(
+            status=200, message=f"Заметка с id(pk) {pk} удалена", data=serializer.data
+        )
 
     def update(self, request: Request, pk: int = None) -> Response:
         try:
@@ -139,4 +140,50 @@ class CategoryViewSet(viewsets.ViewSet):
         try:
             category = get_object_or_404(Category, pk=pk)
         except Http404:
-            pass
+            return json_response_error(
+                status=404, message=f"Категория с pk(id) {pk} не найдена"
+            )
+        serializer = CategorySerializer(category)
+        return json_response(status=200, data=serializer.data)
+
+    def create(self, request: Request) -> Response:
+        """
+        Method POST
+        View для добавления категории в БД
+        URL: /api/v1/categories/
+        """
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return json_response(
+                status=201, data=serializer.data, message=f"Категория успешно создана"
+            )
+
+        return json_response_error(
+            status=400,
+            data=serializer.errors,
+            message="Ошибка " "в " "данных " "запроса",
+        )
+
+    def list(self, request: Request) -> Response:
+        """
+        Method GET
+        View для получения всех категорий, имеющихся в БД
+        URL: /api/v1/categories/
+        """
+        queryset = Category.objects.all()
+        serializer = CategorySerializer(queryset, many=True)
+        return json_response(data=serializer.data)
+
+    def destroy(self, request: Request, pk: int = None) -> Response:
+        try:
+            category = get_object_or_404(Category, pk=pk)
+        except Http404:
+            return json_response_error(status=404, message=f"Категория с pk(id) {pk} не найдена")
+
+        category.delete()
+        serializer = CategorySerializer(category)
+        return json_response(status=204, message=f"Категория с pk(id) {pk} успешно "
+                                                 f"удалена")
+
+
