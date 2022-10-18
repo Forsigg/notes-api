@@ -1,4 +1,5 @@
 # Notes API
+[![Coverage Status](https://coveralls.io/repos/github/Forsigg/notes-api/badge.svg)](https://coveralls.io/github/Forsigg/notes-api)
 
 ## Описание проекта
 API для добавления, удаления, получения и изменения заметок (Note). Заметки хранятся в 
