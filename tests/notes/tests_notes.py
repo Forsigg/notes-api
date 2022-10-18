@@ -34,7 +34,7 @@ class NoteTests(APITestCase):
 
     def test_success_get_in_view(self):
         resp = self.client.get("/api/v1/notes/2/")
-        note_id = json.loads(resp.content)['detail']['data']['id']
+        note_id = json.loads(resp.content)["detail"]["data"]["id"]
         note = Note.objects.get(pk=note_id)
         serializer = NoteSerializer(note)
         self.assertEqual(resp.status_code, 200)
@@ -46,7 +46,7 @@ class NoteTests(APITestCase):
             data={"text": "test in view", "author": 2},
             format="json",
         )
-        note_id = json.loads(resp.content)['detail']['data']['id']
+        note_id = json.loads(resp.content)["detail"]["data"]["id"]
         self.assertEqual(resp.status_code, 201)
         note = Note.objects.get(pk=note_id)
         self.assertEqual(note.text, "test in view")
@@ -64,8 +64,7 @@ class NoteTests(APITestCase):
             "/api/v1/notes/3/", data={"text": "new text", "author": 2}, format="json"
         )
         json_resp = json.loads(resp.content)["detail"]["data"]
-        print('JSON!!!', json_resp)
-        note_id = json.loads(resp.content)['detail']['data']['id']
+        note_id = json.loads(resp.content)["detail"]["data"]["id"]
         self.assertEqual(resp.status_code, 201)
         self.assertNotEqual(json_resp, serializer.data)
         note = Note.objects.get(pk=note_id)
